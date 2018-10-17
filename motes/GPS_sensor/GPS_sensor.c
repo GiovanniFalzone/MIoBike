@@ -17,18 +17,18 @@
 #undef CC2420_CONF_CHANNEL
 #define CC2420_CONF_CHANNEL	20
 
-#define SAMPLE_PERIOD	60	// every minute
-#define SEND_PERIOD 	30
+#define SAMPLING_PERIOD	10	// every minute
+#define SENDING_PERIOD 	30
 
-struct GPS_DATA{
+struct Sensor_DATA{
 	long int latitude;
 	long int longitude;
 };
 
 
 /*---------------------------------------------------------------------------*/
-PROCESS(GPS_sensor_process, "I'm a GPS_sensor");
-AUTOSTART_PROCESSES(&GPS_sensor_process);
+PROCESS(Sensor_sensor_process, "I'm a Sensor_sensor");
+AUTOSTART_PROCESSES(&Sensor_sensor_process);
 /*---------------------------------------------------------------------------*/
 
 static void receiver(struct simple_udp_connection *c, const uip_ipaddr_t *sender_addr, uint16_t sender_port, const uip_ipaddr_t *receiver_addr, uint16_t receiver_port, const uint8_t *data, uint16_t datalen) {
@@ -61,47 +61,55 @@ static void print_addresses(uip_ipaddr_t ipaddr) {
 	}
 }
 
-static struct GPS_DATA read_GPS_data(){
+static struct Sensor_DATA read_Sensor_data(){
 	static unsigned int iteration = 0;
 	iteration++;
-	struct GPS_DATA GPS_read;
-	GPS_read.latitude = 43708530 + iteration;
-	GPS_read.longitude = 10403600 + iteration;
-	return GPS_read;
+	struct Sensor_DATA Sensor_read;
+	Sensor_read.latitude = 43708530 + iteration;
+	Sensor_read.longitude = 10403600 + iteration;
+	return Sensor_read;
 }
 
-static void send_GPS_sensor_data(struct GPS_DATA GPS_data){
+static void send_Sensor_sensor_data(struct Sensor_DATA Sensor_data){
 	uip_ipaddr_t addr;
 	static struct simple_udp_connection broadcast_connection;
+// move outside
 	simple_udp_register(&broadcast_connection, UDP_PORT, NULL, UDP_PORT, receiver);
 	uip_create_linklocal_allnodes_mcast(&addr);
-	simple_udp_sendto(&broadcast_connection, (void*)&GPS_data, sizeof(GPS_data), &addr);
-	printf("Sended GPS_read latitude: %ld longitude: %ld\n", GPS_data.latitude, GPS_data.longitude);
+//	big endian little endian problem
+	simple_udp_sendto(&broadcast_connection, (void*)&Sensor_data, sizeof(Sensor_data), &addr);
+	printf("GPS_read latitude: %ld longitude: %ld\n", Sensor_data.latitude, Sensor_data.longitude);
 }
 
-static void main_iteration(uip_ipaddr_t ipaddr, struct etimer send_timer){
-	struct GPS_DATA GPS_read = read_GPS_data();
+static void main_iteration(uip_ipaddr_t ipaddr, struct etimer send_period){
+	static unsigned int iteration = 0;
+	iteration++;
+	printf("iteration: %d\n", iteration);
+	struct Sensor_DATA Sensor_read = read_Sensor_data();
 	leds_toggle(LEDS_ALL);
-	if(etimer_expired(&send_timer)) {
-		send_GPS_sensor_data(GPS_read);
+	if(etimer_expired(&send_period)) {
+		send_Sensor_sensor_data(Sensor_read);
 	}
 }
 
-PROCESS_THREAD(GPS_sensor_process, ev, data) {
-	static struct etimer periodic_timer;
-	static struct etimer send_timer;
+PROCESS_THREAD(Sensor_sensor_process, ev, data) {
+	static struct etimer task_period;
+	static struct etimer send_period;
 
 	PROCESS_BEGIN();
-	etimer_set(&periodic_timer, CLOCK_SECOND*SAMPLE_PERIOD);
-	etimer_set(&send_timer, CLOCK_SECOND*SEND_PERIOD);
+	etimer_set(&task_period, CLOCK_SECOND*SAMPLING_PERIOD);
+	etimer_set(&send_period, CLOCK_SECOND*SENDING_PERIOD);
 	uip_ipaddr_t ipaddr = set_address();
 	print_addresses(ipaddr);
 
 	while(1){
 		PROCESS_WAIT_EVENT();
-		if(etimer_expired(&periodic_timer)) {
-			etimer_reset(&periodic_timer);
-			main_iteration(ipaddr, send_timer);
+		if(etimer_expired(&task_period)) {
+			etimer_reset(&task_period);
+			main_iteration(ipaddr, send_period);
+		}
+		if(etimer_expired(&send_period)) {
+			etimer_reset(&send_period);
 		}
 	}
 	PROCESS_END();
