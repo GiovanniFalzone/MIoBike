@@ -37,7 +37,6 @@ PROCESS_THREAD(test_button_process, ev, data)
 */
 /*---------------------------------------------------------------------------*/
 
-
 /*
  * \file
  *          Temperature sensor simulation for bike system
