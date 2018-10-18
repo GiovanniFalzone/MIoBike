@@ -20,6 +20,8 @@
 #define SAMPLING_PERIOD	10	// every minute
 #define SENDING_PERIOD 	30
 
+#define DEBUG
+
 struct Sensor_DATA{
 	long int latitude;
 	long int longitude;
@@ -27,15 +29,19 @@ struct Sensor_DATA{
 
 
 /*---------------------------------------------------------------------------*/
-PROCESS(Sensor_sensor_process, "I'm a Sensor_sensor");
-AUTOSTART_PROCESSES(&Sensor_sensor_process);
+PROCESS(Sensor_process, "I'm a Sensor_sensor");
+AUTOSTART_PROCESSES(&Sensor_process);
 /*---------------------------------------------------------------------------*/
 
+static struct simple_udp_connection broadcast_connection;
+static struct simple_udp_connection unicast_connection;
+
+
 static void receiver(struct simple_udp_connection *c, const uip_ipaddr_t *sender_addr, uint16_t sender_port, const uip_ipaddr_t *receiver_addr, uint16_t receiver_port, const uint8_t *data, uint16_t datalen) {
-  printf("Data received from ");
-  uip_debug_ipaddr_print(sender_addr);
-  printf(" on port %d from port %d with length %d, Received::\n", receiver_port, sender_port, datalen);
-  printf(data);
+	printf("Data received from ");
+	uip_debug_ipaddr_print(sender_addr);
+	printf(" on port %d from port %d with length %d, Received::\n", receiver_port, sender_port, datalen);
+	printf(data);
 }
 
 
@@ -44,6 +50,9 @@ static uip_ipaddr_t set_address(void){
 	uip_ip6addr(&ipaddr, 0xaaaa, 0, 0, 0, 0, 0, 0, 0);
 	uip_ds6_set_addr_iid(&ipaddr, &uip_lladdr);
 	uip_ds6_addr_add(&ipaddr, 0, ADDR_AUTOCONF);
+
+	simple_udp_register(&broadcast_connection, UDP_PORT, NULL, UDP_PORT, receiver);
+	simple_udp_register(&unicast_connection, UDP_PORT, NULL, UDP_PORT, receiver);
 	return ipaddr;
 }
 
@@ -70,29 +79,43 @@ static struct Sensor_DATA read_Sensor_data(){
 	return Sensor_read;
 }
 
-static void send_Sensor_sensor_data(struct Sensor_DATA Sensor_data){
+static void send_broadcast_sensor_data(struct Sensor_DATA Sensor_data){
 	uip_ipaddr_t addr;
-	static struct simple_udp_connection broadcast_connection;
-// move outside
-	simple_udp_register(&broadcast_connection, UDP_PORT, NULL, UDP_PORT, receiver);
 	uip_create_linklocal_allnodes_mcast(&addr);
 //	big endian little endian problem
 	simple_udp_sendto(&broadcast_connection, (void*)&Sensor_data, sizeof(Sensor_data), &addr);
 	printf("GPS_read latitude: %ld longitude: %ld\n", Sensor_data.latitude, Sensor_data.longitude);
+	#ifdef DEBUG
+		printf("Sending broadcast to ");
+		uip_debug_ipaddr_print(&addr);
+		printf("\n");
+	#endif
 }
 
+static void send_unicast_sensor_data(struct Sensor_DATA Sensor_data){
+	uip_ipaddr_t addr;
+//	big endian little endian problem
+	uip_ip6addr(&addr, 0xfe80, 0, 0, 0, 0xc30c, 0, 0, 0x002);
+	simple_udp_sendto(&unicast_connection, (void*)&Sensor_data, sizeof(Sensor_data), &addr);
+	printf("GPS_read latitude: %ld longitude: %ld\n", Sensor_data.latitude, Sensor_data.longitude);
+	#ifdef DEBUG
+		printf("Sending unicast to ");
+		uip_debug_ipaddr_print(&addr);
+		printf("\n");
+	#endif
+}
+
+
 static void main_iteration(uip_ipaddr_t ipaddr, struct etimer send_period){
-	static unsigned int iteration = 0;
-	iteration++;
-	printf("iteration: %d\n", iteration);
 	struct Sensor_DATA Sensor_read = read_Sensor_data();
 	leds_toggle(LEDS_ALL);
 	if(etimer_expired(&send_period)) {
-		send_Sensor_sensor_data(Sensor_read);
+//		send_broadcast_sensor_data(Sensor_read);
+		send_unicast_sensor_data(Sensor_read);
 	}
 }
 
-PROCESS_THREAD(Sensor_sensor_process, ev, data) {
+PROCESS_THREAD(Sensor_process, ev, data) {
 	static struct etimer task_period;
 	static struct etimer send_period;
 
