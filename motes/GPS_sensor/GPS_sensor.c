@@ -95,7 +95,7 @@ static void send_broadcast_sensor_data(struct Sensor_DATA Sensor_data){
 static void send_unicast_sensor_data(struct Sensor_DATA Sensor_data){
 	uip_ipaddr_t addr;
 //	big endian little endian problem
-	uip_ip6addr(&addr, 0xfe80, 0, 0, 0, 0xc30c, 0, 0, 0x002);
+	uip_ip6addr(&addr, 0xfe80, 0, 0, 0, 0xc30c, 0, 0, 0x0064);
 	simple_udp_sendto(&unicast_connection, (void*)&Sensor_data, sizeof(Sensor_data), &addr);
 	printf("GPS_read latitude: %ld longitude: %ld\n", Sensor_data.latitude, Sensor_data.longitude);
 	#ifdef DEBUG
