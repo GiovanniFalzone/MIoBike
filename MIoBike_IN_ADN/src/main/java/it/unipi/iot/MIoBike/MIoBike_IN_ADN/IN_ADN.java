@@ -2,7 +2,6 @@ package it.unipi.iot.MIoBike.MIoBike_IN_ADN;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import it.unipi.iot.MIoBike.MIoBike_Utils.MIoBike_IN_Manager;
 
 import static it.unipi.iot.MIoBike.MIoBike_Utils.Constants.IN_DEV_MODE;
 import static it.unipi.iot.MIoBike.MIoBike_Utils.Constants.IN_Id;
@@ -43,26 +42,6 @@ public class IN_ADN {
 		if(IN_DEV_MODE) {
 			System.out.println("--------------End Of Initialization -----------------");
 		}
-		JSONArray MNs_array = IN_manager.get_all_MN();
-		for(int i=0; i< MNs_array.length(); i++) {
-			JSONObject MN = MNs_array.getJSONObject(i);
-			String uri_path = MN.getString("uri");
-
-			if(IN_DEV_MODE) {
-				System.out.println(uri_path);
-			}
-
-			String response = IN_manager.get_request_path(uri_path);
-			String bike_cse_path = IN_manager.get_label_from_XMLString("csi", response);
-
-			JSONArray Bikes_array = IN_manager.get_all_AE_uri(bike_cse_path);
-
-			for(int j=0; j< Bikes_array.length(); j++) {
-				JSONObject Bike = Bikes_array.getJSONObject(j);
-				String Bike_uri_path = Bike.getString("uri");
-				IN_manager.get_all_Container_uri(Bike_uri_path);
-//				om2m_IN_Manager.create_Subscription("coap://127.0.0.1:5683/~" + res_path, "coap://127.0.0.1:5685/"+NotificationManager_name, NotificationManager_name);
-			}
-		}
+		IN_manager.print_all_containers_tree();
 	}
 }
