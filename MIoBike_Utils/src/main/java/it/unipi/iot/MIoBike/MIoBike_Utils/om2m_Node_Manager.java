@@ -177,8 +177,10 @@ public class om2m_Node_Manager extends om2m_general {
 	public JSONArray get_all(String uri, int Res_Type) {
 		String query = "fu=1&rty=" + Res_Type;
 		JSONObject Bikes_json = Discovery_request_uri("m2m:uril", uri, query);
-		System.out.println(Bikes_json.toString());
 		JSONArray ret = Bikes_json.getJSONArray("response_array");
+		if(LIBS_DEV_MODE) {
+			System.out.println(Bikes_json.toString());
+		}
 		return ret;		
 	}
 	
@@ -188,14 +190,26 @@ public class om2m_Node_Manager extends om2m_general {
 
 	public JSONArray get_all_Container_uri(String uri) {
 			return get_all(uri, TYPE_CONTAINER);
-		}
-	
+	}
+
+	public JSONArray get_all_AE() {
+		String uri = Node_Id;
+		return get_all(uri, TYPE_AE);
+	}
+
+	public JSONArray get_all_Container() {
+		String uri = Node_Id;
+		return get_all(uri, TYPE_CONTAINER);
+	}	
 	public JSONArray get_all_MN() {
 		String uri = Node_Id;
-		if(LIBS_DEV_MODE) {
-			System.out.println("get_all_MN call");
-		}
 		return get_all(uri, TYPE_MN);
+	}
+	
+	public String get_label_from_path(String path, String label) {
+		String response = get_request_path(path);
+		String ret = get_label_from_XMLString(label, response);
+		return ret;
 	}
 }
 

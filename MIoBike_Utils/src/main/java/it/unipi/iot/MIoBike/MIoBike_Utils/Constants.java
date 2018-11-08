@@ -1,9 +1,9 @@
 package it.unipi.iot.MIoBike.MIoBike_Utils;
 
 public class Constants {
-	public static final boolean IN_DEV_MODE = true;
-	public static final boolean MN_DEV_MODE = true;
-	public static final boolean LIBS_DEV_MODE = true;
+	public static final boolean IN_DEV_MODE = false;
+	public static final boolean MN_DEV_MODE = false;
+	public static final boolean LIBS_DEV_MODE = false;
 
 	public static final int OPTION_ACCESS = 256;
 	public static final int OPTION_TYPE = 267;

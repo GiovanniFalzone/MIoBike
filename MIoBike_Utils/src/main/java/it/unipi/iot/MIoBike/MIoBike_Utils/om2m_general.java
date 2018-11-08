@@ -100,5 +100,11 @@ public class om2m_general {
 		Node nNode = nList.item(0);
 		return nNode.getTextContent();
 	}
+	
+	public String Convert_HTTP_URI_To_CoAP_URI(String uri) {
+		uri = uri.replaceAll("http", "coap");
+		uri = uri.replaceAll("8282/", "IN_port");
+		return uri;
+	}
 }
 
