@@ -5,18 +5,18 @@ import java.util.Date;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapResponse;
 import org.json.JSONObject;
-import it.unipi.iot.MIoBike.MIoBike_Utils.Manager_om2m;
+import it.unipi.iot.MIoBike.MIoBike_Utils.om2m_Node_Manager;
 
 public class Resource_Manager extends Thread{
 	private CoapClient my_coap_client;
 	private int period;
 	private JSONObject last_read;
-	private Manager_om2m my_om2m_MN_manager;
+	private om2m_Node_Manager my_om2m_MN_manager;
 	private String Container_Name;
 	private String Res_Name;
 	private String NotificationManager_name;
 	
-	public Resource_Manager(String resource_uri, Manager_om2m my_om2m_MN_manager, int period, String Res_Name, String Container_Name, String NotificationManager) {
+	public Resource_Manager(String resource_uri, om2m_Node_Manager my_om2m_MN_manager, int period, String Res_Name, String Container_Name, String NotificationManager) {
 		this.my_coap_client = new CoapClient(resource_uri);	
 		this.period = period;
 		this.my_om2m_MN_manager = my_om2m_MN_manager;
@@ -24,8 +24,6 @@ public class Resource_Manager extends Thread{
 		this.Container_Name = Container_Name;
 		this.NotificationManager_name = NotificationManager;
 		this.my_om2m_MN_manager.create_Container(this.Res_Name, this.Container_Name);
-		String res_path = "/"+Res_Name+"-mn-cse/"+Res_Name+"-mn-name/"+Res_Name+"/"+Container_Name;
-		this.my_om2m_MN_manager.create_Subscription("coap://127.0.0.1:5683/~" + res_path, "coap://127.0.0.1:5685/"+NotificationManager_name, NotificationManager_name);
 	}
 
 	private JSONObject read_sensor() {
@@ -57,8 +55,6 @@ public class Resource_Manager extends Thread{
 	public JSONObject get_last_read() {
 		return last_read;
 	}
-
-	public void handle_Notification() {}
 	
 	public void run(){
 		int iteration = 0;

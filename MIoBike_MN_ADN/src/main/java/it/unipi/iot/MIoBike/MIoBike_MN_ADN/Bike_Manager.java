@@ -3,10 +3,12 @@ package it.unipi.iot.MIoBike.MIoBike_MN_ADN;
 import java.util.HashMap;
 import java.util.Map;
 
-import it.unipi.iot.MIoBike.MIoBike_Utils.*;
+import it.unipi.iot.MIoBike.MIoBike_Utils.om2m_Node_Manager;
+import static it.unipi.iot.MIoBike.MIoBike_Utils.Constants.MN_DEV_MODE;
+
 
 public class Bike_Manager {
-	static Manager_om2m my_om2m_MN_manager;
+	static om2m_Node_Manager my_om2m_MN_manager;
 	static String Bike_Name;
 	static String GPS_uri = "coap://[aaaa::c30c:0:0:2]:5683/GPS";
 	static String Lock_uri = "coap://[aaaa::c30c:0:0:3]:5683/Lock";
@@ -16,9 +18,9 @@ public class Bike_Manager {
 	static String Odometer = "coap://[aaaa::c30c:0:0:7]:5683/Odometer";
 	static String Speedometer = "coap://[aaaa::c30c:0:0:8]:5683/Speedometer";
 
+	static String NotificationManager_name;
 	
 	static Map<String, Resource_Manager> Resources = new HashMap<String, Resource_Manager>();
-	static String NotificationManager_name = "NotificationManager";
 	
 	private static void add_resource(String uri, String res_name, int period) {
 		Resource_Manager res = new Resource_Manager(uri, my_om2m_MN_manager, period, Bike_Name, res_name, NotificationManager_name);
@@ -44,9 +46,9 @@ public class Bike_Manager {
 
 		int MN_port = 5683;
 		String MN_uri = "coap://127.0.0.1:"+ MN_port;
-		String MN_Id = Bike_Name + "-mn-cse";
+		String MN_Id = "/" + Bike_Name + "-mn-cse";
 		String MN_Name = Bike_Name + "-mn-name";
-		my_om2m_MN_manager = new Manager_om2m(MN_uri, MN_Id, MN_Name);
+		my_om2m_MN_manager = new om2m_Node_Manager(MN_uri, MN_Id, MN_Name);
 		
 		String Res_Name = Bike_Name;
 		String Res_App_id = Bike_Name + "_id";
@@ -58,10 +60,12 @@ public class Bike_Manager {
 		System.out.println("---------------------------------------------------------------");
 		System.out.println("received notification");
 		System.out.println("---------------------------------------------------------------");
-	}	
-	
+	}
+
 	public static void main( String[] args ) {
 		Bike_Name = "Bike1";
+		NotificationManager_name = Bike_Name + "_NotificationManager";
+
 		System.out.println("-------------- Inizializing " + Bike_Name + "------------------");
 		create_bike_MN();
 		create_resources();
