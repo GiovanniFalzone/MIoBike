@@ -11,23 +11,26 @@ import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.core.network.EndpointManager;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.eclipse.californium.core.server.resources.Resource;
-import it.unipi.iot.MIoBike.MIoBike_MN_ADN.*;
 
 public class CoAPMonitor extends CoapServer {
-	private static final int COAP_PORT = 5685;
+	private static int Coap_port;
 	private static String NotificationManager_name;
+	om2m_Node_Manager owner;
+	
 	void addEndpoints() {
 		for (InetAddress addr : EndpointManager.getEndpointManager().getNetworkInterfaces()) {
 			if (((addr instanceof Inet4Address)) || (addr.isLoopbackAddress()))
 			{
-				InetSocketAddress bindToAddress = new InetSocketAddress(addr, COAP_PORT);
+				InetSocketAddress bindToAddress = new InetSocketAddress(addr, Coap_port);
 				addEndpoint(new CoapEndpoint(bindToAddress));
 			}
 		}
 	}
 	
-	public CoAPMonitor(String NotificationManager_name) throws SocketException {
-		this.NotificationManager_name = NotificationManager_name;
+	public CoAPMonitor(String name, int port, om2m_Node_Manager my_owner) throws SocketException {
+		NotificationManager_name = name;
+		Coap_port = port;
+		owner = my_owner;
 		add(new Resource[] { new Monitor() });
 	}
 	
@@ -41,10 +44,7 @@ public class CoAPMonitor extends CoapServer {
 			exchange.respond(ResponseCode.CREATED);
 			byte[] content = exchange.getRequestPayload();
 			String contentStr = new String(content);
-			Bike_Manager.handle_Notification(contentStr);
-			System.out.println("---------------Notification Handler---------------");
-			System.out.println(contentStr);
-			System.out.println("--------------------------------------------------");
+			owner.Notification_Handler(contentStr);
 		}
 	}
 }

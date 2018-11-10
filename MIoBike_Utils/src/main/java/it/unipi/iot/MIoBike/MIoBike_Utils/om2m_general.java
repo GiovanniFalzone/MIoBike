@@ -25,7 +25,7 @@ public class om2m_general {
 			ret = response.getResponseText();
 		}
 
-		if(LIBS_DEV_MODE) {
+		if(DEV_MODE) {
 			System.out.println("GET_Request to " + uri);
 			if(response == null) {
 				System.out.println("No response received.");
@@ -49,7 +49,7 @@ public class om2m_general {
 		CoapClient client = new CoapClient(uri);
 		CoapResponse response = client.advanced(req);
 
-		if(LIBS_DEV_MODE) {
+		if(DEV_MODE) {
 			System.out.println("POST_Request to " + uri);
 			System.out.println("Payload: " + payload);
 			if (response==null) {
@@ -72,7 +72,7 @@ public class om2m_general {
 		json_root.put("m2m:sub", content);
 
 		post_request(uri, json_root, OPTION_TYPE, TYPE_SUBSCRIPTION, access_credentials);
-		if(LIBS_DEV_MODE) {
+		if(DEV_MODE) {
 			System.out.println("create subscription call to " + uri);
 		}
 	}
@@ -88,6 +88,9 @@ public class om2m_general {
 	}
 	
 	public String get_label_from_XMLString(String tag, String xml_str) {
+		if(DEV_MODE) {
+			System.out.println("get label: "+tag+" from xml_str: " + xml_str);
+		}
 		Document doc = null;
 		try {
 			doc = String_XML_to_XML_Document(xml_str);
@@ -101,9 +104,9 @@ public class om2m_general {
 		return nNode.getTextContent();
 	}
 	
-	public String Convert_HTTP_URI_To_CoAP_URI(String uri) {
+	public String Convert_HTTP_URI_To_CoAP_URI(String uri, int port) {
 		uri = uri.replaceAll("http", "coap");
-		uri = uri.replaceAll("8282/", "IN_port");
+		uri = uri.replaceAll("8282/", ""+port);
 		return uri;
 	}
 }

@@ -12,12 +12,11 @@ import java.util.List;
 import static it.unipi.iot.MIoBike.MIoBike_Utils.Constants.*;
 
 public class om2m_Node_Manager extends om2m_general {
-	String Node_base_path;
-	String access_credentials;
-
-	String Node_uri;
-	String Node_Id;
-	String Node_Name;
+	protected String access_credentials;
+	public String Node_base_path;
+	public String Node_Id;
+	public String Node_uri;
+	public String Node_Name;
 	
 	public om2m_Node_Manager(String uri, String id, String name) {
 		this.Node_base_path = URI_M2M_base_path;
@@ -51,7 +50,7 @@ public class om2m_Node_Manager extends om2m_general {
 
 		post_request(uri, json_root, OPTION_TYPE, TYPE_AE, access_credentials);
 
-		if(LIBS_DEV_MODE) {
+		if(DEV_MODE) {
 			System.out.println("Create AE call to " + uri);
 		}
 	}
@@ -67,7 +66,7 @@ public class om2m_Node_Manager extends om2m_general {
 
 		post_request(uri, json_root, OPTION_TYPE, TYPE_CONTAINER, access_credentials);
 
-		if(LIBS_DEV_MODE) {
+		if(DEV_MODE) {
 			System.out.println("Create Container call to " + uri);
 		}
 	}
@@ -83,48 +82,9 @@ public class om2m_Node_Manager extends om2m_general {
 		json_root.put("m2m:cin", json_res_info);
 
 		post_request(uri, json_root, OPTION_TYPE, TYPE_CONTENT, access_credentials);
-		if(LIBS_DEV_MODE) {
+		if(DEV_MODE) {
 			System.out.println("Create content instance call to " + uri);
 		}
-	}
-
-	public void create_Subscription(String uri, String notificationUrl, String Res_monitor_name){
-		JSONObject content = new JSONObject();
-		content.put("rn", Res_monitor_name);
-		content.put("nu", notificationUrl);
-		content.put("nct", 2);
-
-		JSONObject json_root = new JSONObject();
-		json_root.put("m2m:sub", content);
-
-		post_request(uri, json_root, OPTION_TYPE, TYPE_SUBSCRIPTION, access_credentials);
-		if(LIBS_DEV_MODE) {
-			System.out.println("create subscription call to " + uri);
-		}
-	}
-
-	public Document String_XML_to_XML_Document(String str) throws Exception {
-		Document doc;
-		InputSource is = new InputSource(new StringReader(str));
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		doc = dBuilder.parse(is);
-		doc.getDocumentElement().normalize();
-		return doc;
-	}
-	
-	public String get_label_from_XMLString(String tag, String xml_str) {
-		Document doc = null;
-		try {
-			doc = String_XML_to_XML_Document(xml_str);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		NodeList nList = doc.getElementsByTagName(tag);
-		Node nNode = nList.item(0);
-		return nNode.getTextContent();
 	}
 	
 	public JSONObject Discovery_request_uri(String tag, String uri_path , String query) {
@@ -159,7 +119,7 @@ public class om2m_Node_Manager extends om2m_general {
 		JSONObject json_root = new JSONObject();
 		json_root.put("response_array", jarray);
 
-		if(LIBS_DEV_MODE) {
+		if(DEV_MODE) {
 			System.out.println("Discovery request call call to " + uri);
 			System.out.println(urils_str);
 			System.out.println(items.toString());
@@ -174,42 +134,82 @@ public class om2m_Node_Manager extends om2m_general {
 		return json_root;
 	}
 
-	public JSONArray get_all(String uri, int Res_Type) {
+	public JSONArray get_all(int Res_Type) {
 		String query = "fu=1&rty=" + Res_Type;
-		JSONObject Bikes_json = Discovery_request_uri("m2m:uril", uri, query);
+		JSONObject Bikes_json = Discovery_request("m2m:uril", query);
 		JSONArray ret = Bikes_json.getJSONArray("response_array");
-		if(LIBS_DEV_MODE) {
+		if(DEV_MODE) {
 			System.out.println(Bikes_json.toString());
 		}
 		return ret;		
 	}
+
+	public JSONArray get_all_MN() {
+		return get_all(TYPE_MN);
+	}
 	
-	public JSONArray get_all_AE_uri(String uri) {
-		return get_all(uri, TYPE_AE);
-	}
-
-	public JSONArray get_all_Container_uri(String uri) {
-			return get_all(uri, TYPE_CONTAINER);
-	}
-
 	public JSONArray get_all_AE() {
-		String uri = Node_Id;
-		return get_all(uri, TYPE_AE);
+		return get_all(TYPE_AE);
 	}
 
 	public JSONArray get_all_Container() {
-		String uri = Node_Id;
-		return get_all(uri, TYPE_CONTAINER);
+		return get_all(TYPE_CONTAINER);
 	}	
-	public JSONArray get_all_MN() {
-		String uri = Node_Id;
-		return get_all(uri, TYPE_MN);
-	}
-	
+
+	public JSONArray get_all_Content() {
+		return get_all(TYPE_CONTENT);
+	}	
+		
 	public String get_label_from_path(String path, String label) {
 		String response = get_request_path(path);
 		String ret = get_label_from_XMLString(label, response);
 		return ret;
+	}
+	
+	public void Subscribe_to_each_Container(String notificationUrl, String Res_monitor_name) {
+		JSONArray Containers = get_all_Container();
+		for(int i=0; i< Containers.length(); i++) {
+			JSONObject Container = Containers.getJSONObject(i);
+			String res_path = Container.getString("uri");
+			String uri = Node_uri + Node_base_path + res_path;
+			create_Subscription(uri, notificationUrl, Res_monitor_name, access_credentials);
+			if(DEV_MODE) {
+				System.out.println("Subscribing "+ Res_monitor_name + " NU:" + notificationUrl + " to: " + uri);
+			}
+		}
+	}
+
+	public void Subscribe_to_each_MN(String notificationUrl, String Res_monitor_name) {
+		JSONArray MNs = get_all_MN();
+		for(int i=0; i< MNs.length(); i++) {
+			JSONObject MN = MNs.getJSONObject(i);
+			String res_path = MN.getString("uri");
+			String uri = Node_uri + Node_base_path + res_path;
+			create_Subscription(uri, notificationUrl, Res_monitor_name, access_credentials);
+			if(DEV_MODE) {
+				System.out.println("Subscribing "+ Res_monitor_name + " NU:" + notificationUrl + " to: " + uri);
+			}
+		}
+	}	
+
+	public void Subscribe_to_Itself(String notificationUrl, String Res_monitor_name) {
+		String res_path = Node_Id;
+		String uri = Node_uri + Node_base_path + res_path;
+		create_Subscription(uri, notificationUrl, Res_monitor_name, access_credentials);
+		if(DEV_MODE) {
+			System.out.println("Subscribing "+ Res_monitor_name + " NU:" + notificationUrl + " to: " + uri);
+		}
+	}	
+
+	public void Notification_Handler(String content) {
+		if(DEV_MODE) {
+			System.out.println("-------------Notification Handler------------------------");
+			System.out.println(content);
+		}
+	}
+	
+	public String Get_Node_Name() {
+		return Node_Name;
 	}
 }
 
