@@ -16,6 +16,9 @@ import static it.unipi.iot.MIoBike.MIoBike_Utils.Constants.*;
 public class om2m_general {	
 
 	public String get_request(String uri, String access_credentials) {
+		if(DEV_MODE) {
+			System.out.println("GET_Request to " + uri);
+		}		
 		Request req = new Request(Code.GET);
 		req.getOptions().addOption(new Option(OPTION_ACCESS, access_credentials));
 		CoapClient client = new CoapClient(uri);
@@ -26,7 +29,6 @@ public class om2m_general {
 		}
 
 		if(DEV_MODE) {
-			System.out.println("GET_Request to " + uri);
 			if(response == null) {
 				System.out.println("No response received.");
 			} else {
@@ -39,6 +41,9 @@ public class om2m_general {
 	}
 		
 	public void post_request(String uri, JSONObject json_payload, int opt_num, int opt_val, String access_credentials) {
+		if(DEV_MODE) {
+			System.out.println("POST_Request to " + uri);
+		}
 		String payload = json_payload.toString();
 		Request req = new Request(Code.POST);
 		req.getOptions().setAccept(MediaTypeRegistry.APPLICATION_JSON);
@@ -50,7 +55,6 @@ public class om2m_general {
 		CoapResponse response = client.advanced(req);
 
 		if(DEV_MODE) {
-			System.out.println("POST_Request to " + uri);
 			System.out.println("Payload: " + payload);
 			if (response==null) {
 				System.out.println("No response received.");
@@ -106,6 +110,7 @@ public class om2m_general {
 	
 	public String Convert_HTTP_URI_To_CoAP_URI(String uri, int port) {
 		uri = uri.replaceAll("http", "coap");
+		uri = uri.replaceAll("8080/", ""+port);
 		uri = uri.replaceAll("8282/", ""+port);
 		return uri;
 	}

@@ -16,4 +16,9 @@ public class Constants {
 	public static final String M2M_admin_credentials = "admin:admin";
 
 	public static final int OM2M_port = 5683;
+
+	public static final String	Service_Name = "MIo-Bike";
+	public static final int		IN_NM_port = 5685;
+	public static final String	IN_NM_NAME = Service_Name + "_NM";
+
 }
