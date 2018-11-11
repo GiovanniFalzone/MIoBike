@@ -80,7 +80,7 @@
 				<!-- MainClass in mainfest make a executable jar -->
 				<archive>
 					<manifest>
-						<mainClass>$PACKAGE.$MAINCLASS</mainClass>
+						<mainClass>it.unipi.iot.MIoBike.MIoBike_MN_ADN.MN_ADN</mainClass>
 					</manifest>
 				</archive>
 			</configuration>
