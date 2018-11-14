@@ -29,7 +29,16 @@ public class om2m_Node_Manager extends om2m_general {
 	}
 
 	public String get_from_Resource(String Res_Name, String Res_Container_Name, String Instance_Name) {
-		String uri_path = Node_Id + Node_Name + Res_Name + "/" + Res_Container_Name;
+		if(!Instance_Name.contains("/")) {
+			Instance_Name = "/" + Instance_Name;
+		}
+		if(!Res_Container_Name.contains("/")) {
+			Res_Container_Name = "/" + Res_Container_Name;
+		}
+		if(!Res_Name.contains("/")) {
+			Res_Name = "/" + Res_Name;
+		}
+		String uri_path = Node_Id + Node_Name + Res_Name + Res_Container_Name + Instance_Name;
 		String ret = get_request_path(uri_path);
 		return ret;
 	}
@@ -139,14 +148,24 @@ public class om2m_Node_Manager extends om2m_general {
 		}
 		return ret;		
 	}
-
+// da cancellare, inutile fatta così
 	public JSONArray get_all_in_Res(String Res_path, int Res_Type) {
-		String query = "fu=1&rty=" + Res_Type;
-		Res_path = Node_Id + Res_path;
-		JSONObject json_obj = Discovery_request_uri("m2m:uril", Res_path, query);
-		JSONArray ret = json_obj.getJSONArray("response_array");
+		if(!(Res_path.getBytes()[0] == '/')) {
+			Res_path = "/" + Res_path;
+		}
+
+		JSONArray ret = new JSONArray();
+		JSONArray jarray = get_all(Res_Type);
+		for(int i=0; i< jarray.length(); i++) {
+			JSONObject element = jarray.getJSONObject(i);
+			String obj_res_path = element.getString("uri");
+			if(obj_res_path.contains(Res_path)) {
+				System.out.println(element.toString());
+				ret.put(element);
+			}
+		}
 		if(DEV_MODE) {
-			System.out.println(json_obj.toString());
+			System.out.println(ret.toString());
 		}
 		return ret;		
 	}

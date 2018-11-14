@@ -18,7 +18,21 @@ public class Constants {
 	public static final int OM2M_port = 5683;
 
 	public static final String	Service_Name = "MIo-Bike";
-	public static final int		IN_NM_port = 5685;
-	public static final String	IN_NM_NAME = Service_Name + "_NM";
 
+	public static final String NM_name_extension = "_NM"; 
+	
+	public static final int		IN_NM_port = 5685;
+	public static final String	IN_NM_NAME = Service_Name + NM_name_extension;
+
+	public static final int		MN_om2m_port = OM2M_port;
+	public static final int 	MN_NM_port = 5686;
+
+	public static final int		IN_om2m_port = OM2M_port;
+
+	public static final String	IN_address = "coap://127.0.0.1";
+	public static final String	IN_uri = IN_address+ ":" + IN_om2m_port;
+	public static final String	IN_Id = "/" + Service_Name + "-in-cse";
+	public static final String	IN_Name = "/" + Service_Name + "-in-name";
+
+	public static final String	IN_NM_url = IN_address + ":" + IN_NM_port + "/" + IN_NM_NAME;	
 }
