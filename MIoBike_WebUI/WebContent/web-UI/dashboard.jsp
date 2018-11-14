@@ -42,8 +42,8 @@
 			<img class="usr-img" src="${path}/web-UI/img/icons/<%=session.getAttribute("avatar")%>" width="100"> 
 			<div class="usr-info"><%=session.getAttribute("username")%> </div>
 			<div class="usr-data">
-				<div class="usr-info d-none d-md-block label">Subscription ID:</div><div class="usr-info data"> <%=session.getAttribute("subscriptionId")%></div>
-				<div class="usr-info d-none d-md-block label">Key ID:</div><div class="usr-info data"> <%=session.getAttribute("keyId")%></div>
+				<div class="usr-info d-none d-md-block label">Subscription ID:</div><div id="subs_ID" class="usr-info data"><%=session.getAttribute("subscriptionId")%></div>
+				<div class="usr-info d-none d-md-block label">Key ID:</div><div id="key_ID" class="usr-info data"><%=session.getAttribute("keyId")%></div>
 			</div>
 		</div>
 

@@ -1,11 +1,17 @@
-$(document).ready( function() {
+/*$(document).ready( function() {
+	console.log("ciao");
+	console.log($.("#subs_ID").text());
+	/*$.get("UserDataServlet", function(resp) {
+		
+	});*/
 	
-	$.get("CoapServlet", function(resp) {    // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response JSON...
+	/*$.get("CoapServlet", function(resp) {
 		console.log("ciao"+resp);
 		alert(resp);
-		/*var $ul = $("<ul>").appendTo($("#somediv")); // Create HTML <ul> element and append it to HTML DOM element with ID "somediv".
-        $.each(responseJson, function(index, item) { // Iterate over the JSON array.
-            $("<li>").text(item).appendTo($ul);      // Create HTML <li> element, set its text content with currently iterated item and append it to the <ul>.
-        });*/
-    });
+    });*/
+$(document).ready(function() {
+	var id = $("#subs_ID").text();
+	$.get("../SubscriptionDataServlet", {subscription_ID:id}, function(resp) {
+		console.log(resp);
+	});
 });

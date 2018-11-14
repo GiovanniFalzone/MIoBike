@@ -108,9 +108,9 @@ public class LoginServlet extends HttpServlet {
 		current_session.setAttribute("avatar", user.get("avatar").toString());
 		
 		//redirect to dashboard
-		//response.sendRedirect("web-UI/dashboard.jsp");
-		RequestDispatcher dispatcher = request.getRequestDispatcher("web-UI/dashboard.jsp");
-		dispatcher.forward(request, response);
+		response.sendRedirect("web-UI/dashboard.jsp");
+		//RequestDispatcher dispatcher = request.getRequestDispatcher("web-UI/dashboard.jsp");
+		//dispatcher.forward(request, response);
 	}
 
 }

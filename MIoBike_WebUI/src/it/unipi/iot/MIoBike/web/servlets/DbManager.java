@@ -145,4 +145,32 @@ public class DbManager {
 	
 		return user;
 	}
+
+	public HashMap<String, Object> get_subscription(int id) throws Exception {
+		String query = "SELECT * FROM `subscriptions` WHERE ID_subscription = '"+id+"'";
+		
+		openConnection();
+		ResultSet rs = executeQuery(query);
+		
+		if (!rs.first()) {
+			closeConnection();
+			return null;
+		}
+		
+		HashMap<String, Object> data = new HashMap<String, Object>();	//associative array
+
+		data.put("activation_date", rs.getString("activation_date"));
+		data.put("expiration_date", rs.getString("expiration_date"));
+		data.put("balance", rs.getDouble("balance"));
+		
+		closeConnection();
+	
+		return data;
+	}
+	
+	//TODO
+	/*
+	get_subscription_data(int subs_ID);
+	get_userinfo(int user_ID);
+	*/
 }
