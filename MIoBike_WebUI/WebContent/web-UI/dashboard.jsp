@@ -42,6 +42,7 @@
 			<img class="usr-img" src="${path}/web-UI/img/icons/<%=session.getAttribute("avatar")%>" width="100"> 
 			<div class="usr-info"><%=session.getAttribute("username")%> </div>
 			<div class="usr-data">
+				<div class="usr-info d-none d-md-block label">User ID:</div><div id="user_ID" class="usr-info data"><%=session.getAttribute("userId")%></div>
 				<div class="usr-info d-none d-md-block label">Subscription ID:</div><div id="subs_ID" class="usr-info data"><%=session.getAttribute("subscriptionId")%></div>
 				<div class="usr-info d-none d-md-block label">Key ID:</div><div id="key_ID" class="usr-info data"><%=session.getAttribute("keyId")%></div>
 			</div>
@@ -71,29 +72,29 @@
 				<div class="col-lg-6 p-0">
 					<div class="subsection">
 						<div class="title"> Balance </div>
-						<div class="data green big"> 50</div>
+						<div id="balance"class="data big"> 50</div>
 						<img class="icon" src="img/icons/balance.png">
 					</div>
 				</div>
 				<div class="col-lg-6 p-0">
 					<div class="subsection"> 
-						<div class="title">	Expiring date </div>
-						<div class="data"> <span class="data red">20/12/18</span> You have 500 days</div>
+						<div class="title">	Expiring date  <span id="exp-date" class="data red"></span></div>
+						<div class="data"><span id="remaining-time"></span></div>
 						<form>Renew Subscription</form>
 					</div>
 				</div>
 				<div class="col-12 p-0">
 					<div>Daily Statistics</div>
 				</div>
-				<div class="col-lg-4 p-0"><div class="subsection"> # trips</div></div>
-				<div class="col-lg-4 p-0"><div class="subsection"> Kilometers </div></div>
-				<div class="col-lg-4 p-0"><div class="subsection"> Calories </div></div>
+				<div class="col-lg-4 p-0"><div class="subsection"> # trips: <span id="daily-trips"></span></div></div>
+				<div class="col-lg-4 p-0"><div class="subsection"> Kilometers: <span id="daily-km"></span></div></div>
+				<div class="col-lg-4 p-0"><div class="subsection"> Calories: <span id="daily-cal"></span></div></div>
 				<div class="col-12 p-0">
 					<div>Total Statistics</div>
 				</div>
-				<div class="col-lg-4 p-0"><div class="subsection"> # trips</div></div>
-				<div class="col-lg-4 p-0"><div class="subsection"> Kilometers </div></div>
-				<div class="col-lg-4 p-0"><div class="subsection"> Calories </div></div>
+				<div class="col-lg-4 p-0"><div class="subsection"> # trips: <span id="trips"></span></div></div>
+				<div class="col-lg-4 p-0"><div class="subsection"> Kilometers: <span id="km"></span></div></div>
+				<div class="col-lg-4 p-0"><div class="subsection"> Calories: <span id="cal"></span></div></div>
 			</div>
 			<div class="dashboard-section row" id="map-section">
 				<div class="col-4 p-0">

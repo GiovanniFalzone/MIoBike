@@ -11,6 +11,8 @@ top-left	43.7245, 10.3902
 bottom-right43.7208, 10.4216
 top-right	43.7043, 10.415
 */
+var LOCKED = 1;
+var UNLOCKED = 0;
 
 var min_lat = 43.7043;
 var max_lat = 43.7245;
@@ -22,6 +24,9 @@ var movingBikeLayer;
 var lockedBikeLayer;
 var lockerLayer;
 var feat;
+//vector of bikes
+var lockedBikeVector;
+var movingBikeVector;
 
 var icons_dir = '/MIoBike_WebUI/web-UI/img/icons';
 var icon_scale = 0.3;
@@ -31,9 +36,9 @@ var icon_scale = 0.3;
 *	1 for red: "locked";
 *	2 for yellow: "locker";
 */
-function addMarker(lat, lon, source, icon) {
-
-	switch(icon){
+function addMarker(lat, lon, source, status) {
+	var icon;
+	switch(status){
 		case 0:
 			icon = "green_marker.png";
 			break;
@@ -85,6 +90,7 @@ function addRandomMarkers(source, n, type) {
 }
 
 function toggleLayer(layer) {
+	//addRandomMarkers(lockedBikeVector, 10, 1);
 	if(layer.getVisible())
 		layer.setVisible(false);
 	else
@@ -100,6 +106,18 @@ function moveMarker(marker, dir, offset) {
 	var new_pos = ol.proj.fromLonLat([10.3025, 43.7140]);
 
 	marker.getGeometry().setCoordinates(new_pos);
+}
+
+function getBikeGPS() {
+
+	var lat = 43.7164;
+	var lon = 10.4020;
+	
+	addMarker(lat, lon, lockedBikeVector, LOCKED); 
+	/*$.get("../RequestHandlerServlet", function(resp) {
+		
+		console.log(resp);
+	});*/
 }
 
 function mapInit(){
@@ -125,13 +143,19 @@ function mapInit(){
 	});
 
 	// create a vector to add the marker feature
-	var lockedBikeVector = new ol.source.Vector({});
-	var lockerVector = new ol.source.Vector({});
-	var movingBikeVector = new ol.source.Vector({});
-
-	addRandomMarkers(lockedBikeVector, 10, 1);
-	addRandomMarkers(lockerVector, 4, 2);
-	feat = addMarker(43.7151, 10.4025, movingBikeVector, 0);
+	lockedBikeVector = new ol.source.Vector({});
+	//var lockerVector = new ol.source.Vector({});
+	movingBikeVector = new ol.source.Vector({});
+	
+	getBikeGPS();
+	//var coord = getBikeGPS();
+	//var GPS_lat = coord.lat;
+	//var GPS_lon = coord.long;
+	
+	//feat = addmarker(GPS_lat,GPS_lon, lockedBikeVector, 1);
+	//addRandomMarkers(lockedBikeVector, 10, 1);
+	//addRandomMarkers(lockerVector, 4, 2);
+	feat = addMarker(43.7151, 10.4025, movingBikeVector, UNLOCKED);
 
 	/*addMarker(43.7151, 10.4025, vectorSource, 0);
 	addMarker(min_lat, min_lon, vectorSource, 1);
@@ -142,22 +166,22 @@ function mapInit(){
 
 	// layers da aggiungere alla mappa
 	lockedBikeLayer = new ol.layer.Vector({
-		visible: false,
+		visible: true,
 		source: lockedBikeVector,
 	});
 
-	lockerLayer = new ol.layer.Vector({
+	/*lockerLayer = new ol.layer.Vector({
 		visible: false,
 		source: lockerVector,
-	});
+	});*/
 
 	movingBikeLayer = new ol.layer.Vector({
 		visible: false,
 		source: movingBikeVector,
 	});
-
+	
 	map.addLayer(lockedBikeLayer);
-	map.addLayer(lockerLayer);
+	//map.addLayer(lockerLayer);
 	map.addLayer(movingBikeLayer);
 
 };

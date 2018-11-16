@@ -17,7 +17,12 @@ import org.json.JSONObject;
 @WebServlet("/SubscriptionDataServlet")
 public class SubscriptionDataServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+	
+	// Constant for type of request
+    private static final int SUBS = 1;
+    private static final int STATS = 1;
+    private static final int TRIPS = 1;
+    
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -25,6 +30,11 @@ public class SubscriptionDataServlet extends HttpServlet {
         super();
         // TODO Auto-generated constructor stub
     }
+    
+    @Override
+   	public void init() throws ServletException {
+   		System.out.println("----------- initializing Subs Servlet ------------");
+   	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -38,13 +48,13 @@ public class SubscriptionDataServlet extends HttpServlet {
 		HashMap<String, Object> res = new HashMap<String, Object>();
 		
 		try {
-			res = db.get_subscription(subs_ID);
+			res = db.getSubscription(subs_ID);
 			if(res==null) {
 				response.getWriter().write("There is no subscription with id "+subs_ID);
 				return;
 			}
 		} catch (Exception e) {
-			response.getWriter().write("Error while performing query.");
+			response.getWriter().write("Error while performing query to retrieve subscription info");
 			return;
 		}
 		

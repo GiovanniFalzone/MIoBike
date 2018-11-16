@@ -72,7 +72,7 @@ public class LoginServlet extends HttpServlet {
 				return;
 			}
 		} catch (Exception e) {
-			response.getWriter().write("Error while performing query.");
+			response.getWriter().write("Error while performing query for authentication");
 		}
 		
 		HashMap<String, Object> user = null;
@@ -81,7 +81,7 @@ public class LoginServlet extends HttpServlet {
 			//login on database
 			user = db.login(usr, pwd);
 		} catch (Exception e) {
-			response.getWriter().write("Error while performing query.");
+			response.getWriter().write("Error while performing query for login");
 		}
 		
 		//check if "admin" button was pressed and if the user is an admin
@@ -98,7 +98,9 @@ public class LoginServlet extends HttpServlet {
 		}
 		
 		//set the current session with user data
-		System.out.println("------------------- Logging in -------------------");
+		System.out.println(current_session.toString());
+		String id = user.get("ID_user").toString();
+		System.out.println(id);
 		current_session.setAttribute("userId", (int)user.get("ID_user"));
 		current_session.setAttribute("username", user.get("username").toString());
 		current_session.setAttribute("email",  user.get("email").toString());
@@ -106,6 +108,7 @@ public class LoginServlet extends HttpServlet {
 		current_session.setAttribute("keyId", (int)user.get("ID_key"));
 		current_session.setAttribute("weight", (double)user.get("weight"));
 		current_session.setAttribute("avatar", user.get("avatar").toString());
+		current_session.setAttribute("errorMessage", null);
 		
 		//redirect to dashboard
 		response.sendRedirect("web-UI/dashboard.jsp");
