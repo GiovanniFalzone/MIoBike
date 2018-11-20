@@ -1,3 +1,3 @@
 #!/bin/sh
 
-cp -R ~/eclipse-workspace/MIoBike_IN_ADN .
+cp -R ~/eclipse-workspace/MIoBike_IN_App .
