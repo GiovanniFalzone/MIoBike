@@ -1,4 +1,4 @@
 #!/bin/sh
 
-cp -R MIoBike_Utils ~/eclipse-workspace
+cp -R MIoBike_common ~/eclipse-workspace
 
