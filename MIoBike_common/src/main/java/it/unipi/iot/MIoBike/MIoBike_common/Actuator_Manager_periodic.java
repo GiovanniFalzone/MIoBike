@@ -3,6 +3,8 @@ package it.unipi.iot.MIoBike.MIoBike_common;
 import static it.unipi.iot.MIoBike.MIoBike_common.Constants.*;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapResponse;
+import org.eclipse.californium.core.coap.CoAP;
+import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.json.JSONObject;
 
 public class Actuator_Manager_periodic extends Resource_Manager{
@@ -16,12 +18,13 @@ public class Actuator_Manager_periodic extends Resource_Manager{
 
 	@Override
 	public void execute_Job() {
-		my_coap_client = new CoapClient(Resource_uri+"/?value="+Status);
-		CoapResponse response = my_coap_client.get();
+		my_coap_client = new CoapClient(Resource_uri);
+		JSONObject payload = new JSONObject();
+		payload.put(JSON_KEY_FORMAT, "boolean");
+		payload.put(JSON_KEY_VALUE, Status);
+		CoapResponse response = my_coap_client.put(payload.toString(), MediaTypeRegistry.APPLICATION_JSON);
 		if (response!=null) {
-			JSONObject res_json = new JSONObject(response.getResponseText());
-			String act_status = res_json.getString(JSON_KEY_VALUE);
-			if(!act_status.equals(Status)) {
+			if(response.getCode() == CoAP.ResponseCode.INTERNAL_SERVER_ERROR) {
 				if(DEV_MODE) {
 					System.out.println("Actuator Problem");
 				}
